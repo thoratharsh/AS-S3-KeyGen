@@ -7,6 +7,26 @@ chrome.contextMenus.create({
     id: "copy-as-s3-key",
     title: "Copy AS S3 Key",
     contexts: ["selection"],
+}
+);
+
+chrome.contextMenus.create(
+    {
+        id: "copy-as-docid",
+        title: "Copy AS Docid",
+        contexts: ["all"],
+    }
+);
+
+var selectedTab = null
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.log("Received message" + request.toString())
+    if (request.action === "copyToClipboard") {
+        console.log("Copied " + request.dataId + " to clipboard")
+        // Copy text to clipboard
+        executeCopyToCb(selectedTab, request.dataId);
+    }
 });
 
 /**
@@ -21,10 +41,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         console.log("S3 Key: " + s3Key);
 
         if (s3Key.length === 0) {
-            alert("Invalid selected text length");
+            console.log("Invalid selected text length");
             return;
         }
         executeCopyToCb(tab, s3Key);
+    }
+
+    if (info.menuItemId === "copy-as-docid") {
+        chrome.tabs.sendMessage(tab.id, "copyDataId", {frameId: info.frameId});
+        selectedTab = tab
     }
 });
 
