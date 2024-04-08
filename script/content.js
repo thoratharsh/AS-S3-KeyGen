@@ -3,6 +3,8 @@ function findNearestDataIdElement(element) {
     if (!element) return null;
     if (element.getAttribute("data-cy-document-id")) {
         return element;
+    } else if(element.id === "copyToClip"){
+        return element
     } else {
         return findNearestDataIdElement(element.parentElement);
     }
@@ -19,7 +21,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         const nearestDataIdElement = findNearestDataIdElement(clickedElement);
         if (nearestDataIdElement) {
             // Get the data-id attribute
-            const dataId = nearestDataIdElement.getAttribute("data-cy-document-id");
+            var dataId = nearestDataIdElement.getAttribute("data-cy-document-id");
+            if(nearestDataIdElement.id === 'copyToClip'){
+                dataId = nearestDataIdElement.children[0].innerText.split("=").pop()
+            }
             // Send the data-id back to the background script
             chrome.runtime.sendMessage({action: "copyToClipboard", dataId: dataId});
             console.log("Sent message copy to clipboard" + request.toString())
