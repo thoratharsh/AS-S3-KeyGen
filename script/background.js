@@ -21,7 +21,7 @@ chrome.contextMenus.create(
 var selectedTab = null
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log("Received message" + request.toString())
+    console.log("Received message" + request)
     if (request.action === "copyToClipboard") {
         console.log("Copied " + request.dataId + " to clipboard")
         // Copy text to clipboard
@@ -48,8 +48,17 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 
     if (info.menuItemId === "copy-as-docid") {
+        console.log("Clicked copy-as-docid context menue")
         chrome.tabs.sendMessage(tab.id, "copyDataId", {frameId: info.frameId});
+        chrome.runtime.sendMessage({action: "copyDataId"});
         selectedTab = tab
+
+        var elt = {};
+        chrome.tabs.sendMessage(tab.id, "getClickedEl", {frameId: info.frameId}, data => {
+            elt.value = data.value;
+        });
+
+        console.log("elt value:" + elt)
     }
 });
 

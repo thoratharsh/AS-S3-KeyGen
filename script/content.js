@@ -10,10 +10,11 @@ function findNearestDataIdElement(element) {
 
 // Listen for the context menu item selection
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log("Received message" + request.toString())
-    if (request === "copyDataId") {
+    console.log("Received message" + request)
+    if (request === "copyDataId" || request.action === "copyDataId") {
         // Get the right-clicked element
         const clickedElement = window.getSelection().anchorNode.parentElement;
+        console.log("Click element is:" + clickedElement)
         // Find the nearest parent with data-id attribute
         const nearestDataIdElement = findNearestDataIdElement(clickedElement);
         if (nearestDataIdElement) {
@@ -23,5 +24,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             chrome.runtime.sendMessage({action: "copyToClipboard", dataId: dataId});
             console.log("Sent message copy to clipboard" + request.toString())
         }
+    }
+});
+
+
+//content script
+var clickedEl = null;
+
+document.addEventListener("contextmenu", function(event){
+    clickedEl = event.target;
+}, true);
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if(request == "getClickedEl") {
+        sendResponse({value: clickedEl.value});
     }
 });
