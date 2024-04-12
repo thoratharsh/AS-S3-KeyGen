@@ -15,10 +15,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log("Received message" + request)
     if (request === "copyDataId" || request.action === "copyDataId") {
         // Get the right-clicked element
-        const clickedElement = window.getSelection().anchorNode.parentElement;
+        var clickedElement = null;
+        clickedElement = window.getSelection().anchorNode.parentElement;
         console.log("Click element is:" + clickedElement)
         // Find the nearest parent with data-id attribute
-        const nearestDataIdElement = findNearestDataIdElement(clickedElement);
+        var nearestDataIdElement = findNearestDataIdElement(clickedElement);
         if (nearestDataIdElement) {
             // Get the data-id attribute
             var dataId = nearestDataIdElement.getAttribute("data-cy-document-id");
